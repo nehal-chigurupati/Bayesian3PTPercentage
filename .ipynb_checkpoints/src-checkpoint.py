@@ -3,15 +3,24 @@ import numpy as np
 from scipy.stats import binom, norm
 import numpy as np
 
-def bayesian_3pt_percentage_with_credible_interval(historical_pct, current_attempts, current_made, prior_std=0.03, credible_level=0.95):
+def bayesian_3pt_percentage_with_credible_interval(historical_pct, current_attempts, current_made, prior_std=0.05, credible_level=0.95):
+    """
+    Calculate the Bayesian 3-point shooting percentage along with a credible interval.
 
-    #Prior Distribution
+    :param historical_pct: Player's historical 3-point shooting percentage.
+    :param current_attempts: Number of 3-point attempts in the current season.
+    :param current_made: Number of successful 3-point shots in the current season.
+    :param prior_std: Standard deviation for the prior distribution (default 0.05).
+    :param credible_level: Credible level for the interval (default 0.95).
+    :return: Bayesian 3-point shooting percentage estimate and credible interval.
+    """
+    # Step 1: Establish a Prior Distribution
     prior_distribution = norm(historical_pct, prior_std)
 
-    #Likelihood Function
+    # Step 3: Choose a Likelihood Function
     likelihood = binom(current_attempts, current_made/current_attempts)
 
-    #Update the Prior with Current Data (Posterior Distribution)
+    # Step 4: Update the Prior with Current Data (Posterior Distribution)
     percentage_values = np.linspace(0, 1, 1000)  # Possible 3-point percentages
     posterior_probabilities = likelihood.pmf(current_made) * prior_distribution.pdf(percentage_values)
 
@@ -30,5 +39,7 @@ def bayesian_3pt_percentage_with_credible_interval(historical_pct, current_attem
     cumulative_probabilities = np.cumsum(posterior_probabilities)
     lower_bound_idx = np.where(cumulative_probabilities >= (1 - credible_level) / 2)[0][0]
     upper_bound_idx = np.where(cumulative_probabilities >= 1 - (1 - credible_level) / 2)[0][0]
+    credible_interval = (percentage_values[lower_bound_idx], percentage_values[upper_bound_idx])
 
-    return bayesian_estimate, percentage_values[lower_bound_idx], percentage_values[upper_bound_idx]
+    return bayesian_estimate, credible_interval
+
