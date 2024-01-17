@@ -3,7 +3,7 @@ import numpy as np
 from scipy.stats import binom, norm
 import numpy as np
 
-def bayesian_3pt_percentage_with_credible_interval(historical_pct, current_attempts, current_made, prior_std=0.03, credible_level=0.95):
+def bayesian_3pt_percentage_with_credible_interval(historical_pct, current_attempts, current_made, prior_std=0.1, credible_level=0.95):
 
     #Prior Distribution
     prior_distribution = norm(historical_pct, prior_std)
@@ -23,7 +23,7 @@ def bayesian_3pt_percentage_with_credible_interval(historical_pct, current_attem
     # Normalize the posterior probabilities
     posterior_probabilities /= sum_posterior
 
-    # Step 5: Calculate the Bayesian 3-Point Percentage
+    # Calculate the Bayesian 3-Point Percentage
     bayesian_estimate = np.sum(percentage_values * posterior_probabilities)
 
     # Calculate the credible interval
